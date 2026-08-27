@@ -179,6 +179,35 @@
   a.row:hover .row-arrow{ transform:translateX(3px); opacity:1; }
   a.row:hover .row-icon{ background:rgba(201,162,75,0.1); }
 
+  /* ---------- OBS NOTE ---------- */
+  .obs{
+    margin:18px 4px 4px;
+    padding:12px 14px;
+    border:1px solid var(--hair);
+    border-radius:8px;
+    background:rgba(201,162,75,0.05);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .obs svg{
+    flex:0 0 auto;
+    width:18px; height:18px;
+    color:var(--gold-mid);
+  }
+  .obs p{
+    margin:0;
+    font-family:'Montserrat', sans-serif;
+    font-size:11.5px;
+    letter-spacing:0.02em;
+    line-height:1.5;
+    color:var(--muted);
+  }
+  .obs strong{
+    color:var(--gold-light);
+    font-weight:600;
+  }
+
   /* ---------- PERFORATION ---------- */
   .perf-wrap{
     position:relative;
@@ -222,6 +251,27 @@
     color:var(--muted); margin-top:4px;
   }
 
+  .cd-live{
+    display:none;
+    text-align:center;
+    padding:26px 20px 6px;
+  }
+  .cd-live.show{ display:block; }
+  .cd-live-text{
+    font-family:'Tangerine', cursive;
+    font-weight:700;
+    font-size:clamp(44px,13vw,56px);
+    line-height:1;
+    color:var(--gold-light);
+    margin:0;
+    text-shadow:0 4px 22px rgba(201,162,75,0.35);
+    animation: glow 2.4s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%,100%{ opacity:0.85; }
+    50%{ opacity:1; }
+  }
+
   /* ---------- DRESS CODE ---------- */
   .dresscode{ padding:26px 30px 6px; text-align:center; }
   .section-title{
@@ -238,17 +288,10 @@
   .avoid-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
   .swatch{
     width:30px; height:30px; border-radius:50%;
-    position:relative; border:1px solid rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.12);
   }
   .swatch.brown{ background:#6b4226; }
   .swatch.white{ background:#f2ead9; }
-  .swatch::after{
-    content:"";
-    position:absolute; left:50%; top:50%;
-    width:140%; height:1.5px;
-    background:#c94b4b;
-    transform:translate(-50%,-50%) rotate(45deg);
-  }
   .avoid-lbl{
     font-family:'Montserrat', sans-serif;
     font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase;
@@ -307,6 +350,7 @@
   @media (prefers-reduced-motion: reduce){
     .card{ animation:none; opacity:1; transform:none; }
     #dust{ display:none; }
+    .cd-live-text{ animation:none; }
   }
 </style>
 </head>
@@ -333,7 +377,7 @@
         </div>
         <div class="row-text">
           <p class="row-label">Data</p>
-          <p class="row-value">Sábado, 27 de Junho de 2027</p>
+          <p class="row-value">Domingo, 27 de Junho de 2027</p>
         </div>
       </div>
 
@@ -359,6 +403,11 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg>
         </div>
       </a>
+
+      <div class="obs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16" r="0.6" fill="currentColor" stroke="none"/></svg>
+        <p><strong>Obs:</strong> evento apenas para adultos — pedimos gentilmente que não traga crianças.</p>
+      </div>
     </div>
 
     <div class="perf-wrap"><span class="notch left"></span><span class="notch right"></span></div>
@@ -368,6 +417,9 @@
       <div class="cd-unit"><div class="cd-num" id="cd-hours">00</div><div class="cd-lbl">Horas</div></div>
       <div class="cd-unit"><div class="cd-num" id="cd-mins">00</div><div class="cd-lbl">Min</div></div>
       <div class="cd-unit"><div class="cd-num" id="cd-secs">00</div><div class="cd-lbl">Seg</div></div>
+    </div>
+    <div class="cd-live" id="cdLive">
+      <p class="cd-live-text">Hoje a casa cai</p>
     </div>
 
     <div class="dresscode">
@@ -396,13 +448,20 @@
 </div>
 
 <script>
-  /* ---------- Countdown to 27 Jun 2026, 16:00 ---------- */
-  const target = new Date("2027-06-27T16:00:00");
+  /* ---------- Countdown to 27 Jun 2027, 18:00 ---------- */
+  const target = new Date("2027-06-27T18:00:00");
+  const countdownEl = document.getElementById('countdown');
+  const cdLiveEl = document.getElementById('cdLive');
 
   function updateCountdown(){
     const now = new Date();
-    let diff = target - now;
-    if(diff < 0) diff = 0;
+    const diff = target - now;
+
+    if(diff <= 0){
+      countdownEl.style.display = 'none';
+      cdLiveEl.classList.add('show');
+      return;
+    }
 
     const days  = Math.floor(diff / (1000*60*60*24));
     const hours = Math.floor((diff / (1000*60*60)) % 24);
